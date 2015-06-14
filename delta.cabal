@@ -53,6 +53,7 @@ library
   -- Modules exported by the library.
   exposed-modules:     System.Delta.Base
                      , System.Delta.Poll
+                     , System.Delta.Callback
                      , System.Delta
   -- Modules included in this library but not exported.
   -- other-modules:       

@@ -9,3 +9,4 @@ class FileWatcher a where
   newFiles        :: a -> Event FilePath
   deletedFiles    :: a -> Event FilePath
   cleanUpAndClose :: a -> IO ()
+

@@ -57,7 +57,7 @@ withNewCallback :: (FileWatcher a)
                         -> (FilePath -> IO ()) -- ^ An IO action on the new path
                         -> IO (CallbackId)
 withNewCallback watcher action = do
-  unregisterCallback <- callbackOnEvent (deletedFiles $ baseWatcher watcher) action
+  unregisterCallback <- callbackOnEvent (newFiles $ baseWatcher watcher) action
   addCallbackUnregister watcher unregisterCallback
 
 -- | Add a callback on a changed file

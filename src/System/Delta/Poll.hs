@@ -64,7 +64,7 @@ diffChangedFiles before after =
   catMaybes . M.elems $ M.intersectionWith f before after
   where
     f beforeInfo afterInfo =
-      if fileInfoTimestamp beforeInfo > fileInfoTimestamp afterInfo
+      if fileInfoTimestamp beforeInfo < fileInfoTimestamp afterInfo
       then Just afterInfo
       else Nothing
 

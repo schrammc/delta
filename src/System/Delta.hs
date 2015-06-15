@@ -4,6 +4,7 @@ module System.Delta ( module System.Delta.Base
                     , module System.Delta.Class
                     , module System.Delta.Callback
                     , deltaDir
+                    , deltaDirWithCallbacks
                     )where
 
 import System.Delta.Base

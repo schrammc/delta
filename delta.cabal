@@ -76,4 +76,17 @@ library
   
   -- Base language which the package is written in.
   default-language:    Haskell2010
-  
+
+executable delta-cli
+
+  build-depends:       base >= 4.8 && < 4.9
+                     , containers >= 0.5
+                     , directory >= 1.2
+                     , filepath >= 1.3
+                     , time >= 1.5
+                     , sodium >= 0.11
+                     , delta
+
+  hs-source-dirs:      src/delta-cli
+
+  main-is:             Main.hs

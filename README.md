@@ -1,4 +1,4 @@
-#delta
+#delta ![Build Status](https://travis-ci.org/kryoxide/delta.svg?branch=master)
 
 This is a haskell library for monitoring filesystem changes. It is FRP based
 but also provides a callback API.

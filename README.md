@@ -46,3 +46,7 @@ outputs:
     changed: /path/to/my/directory/file
     new:     /path/to/my/directory/file2
     del:     /path/to/my/directory/file
+
+## Hosting
+
+This package is [hosted on hackage](http://hackage.haskell.org/package/delta)

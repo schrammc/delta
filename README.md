@@ -34,14 +34,12 @@ You can add callbacks to instances of that type with:
 
 This cabal package also ships an executable called ```delta-cli``` that currently
 watches a directory that you give as an argument
-{% highlight    %}
-delta-cli /path/to/my/directory
-{% endhighlight %}
+
+    delta-cli /path/to/my/directory
 
 outputs:
-{% highlight    %}
-new:     /path/to/my/directory/file
-changed: /path/to/my/directory/file
-new:     /path/to/my/directory/file2
-del:     /path/to/my/directory/file
-{% endhighlight %}
+
+    new:     /path/to/my/directory/file
+    changed: /path/to/my/directory/file
+    new:     /path/to/my/directory/file2
+    del:     /path/to/my/directory/file

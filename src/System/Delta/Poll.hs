@@ -28,7 +28,9 @@ instance FileWatcher PollWatcher where
   deletedFiles (PollWatcher _ _ _ e _) = e
   cleanUpAndClose (PollWatcher _ _ _ _ tId) = killThread tId
 
-createPollWatcher :: Int -> FilePath -> IO PollWatcher
+createPollWatcher :: Int      -- ^ seconds interval
+                  -> FilePath -- ^ path to watch
+                  -> IO PollWatcher
 createPollWatcher secs path = do
   (changedEvent, pushChanged) <- sync $ newEvent
   (deletedEvent, pushDeleted) <- sync $ newEvent
@@ -36,10 +38,12 @@ createPollWatcher secs path = do
   watcherId <- startWatchThread path pushNewFile pushDeleted pushChanged secs
   return $ PollWatcher path changedEvent newFileEvent deletedEvent watcherId
 
+-- | Recursively traverse a folder, follow symbolic links but don't
+-- visit a file twice.
 recursiveDescent path = recursiveDescent' M.empty path
 
 -- | Recursively traverse a folder, follows symbolic links,
--- doesn't loop however
+-- doesn't loop however.
 recursiveDescent' :: M.Map FilePath FileInfo
                   -> FilePath
                   -> IO (M.Map FilePath FileInfo)
@@ -57,6 +61,8 @@ recursiveDescent' visited path = do
     foldM recursiveDescent' visitedWithCurrent contentsAbs
 
 
+-- | List all files that have a larger modification time in the second
+-- map than in the first
 diffChangedFiles :: M.Map FilePath FileInfo 
              -> M.Map FilePath FileInfo
              -> [FileInfo]
@@ -68,16 +74,20 @@ diffChangedFiles before after =
       then Just afterInfo
       else Nothing
 
+-- | List all files that occur in the second map but not the first
 diffNewFiles :: M.Map FilePath FileInfo
-         -> M.Map FilePath FileInfo
-         -> [FileInfo]
-diffNewFiles before after = M.elems $ M.difference after before
-
-diffDeletedFiles :: M.Map FilePath FileInfo
              -> M.Map FilePath FileInfo
              -> [FileInfo]
+diffNewFiles before after = M.elems $ M.difference after before
+
+-- | List all files that occur in the first map but not the second
+diffDeletedFiles :: M.Map FilePath FileInfo
+                 -> M.Map FilePath FileInfo
+                 -> [FileInfo]
 diffDeletedFiles before after = M.elems $ M.difference before after
 
+-- | Fork a thread that continuously polls the given paht and compares
+-- the results of two polls.
 startWatchThread :: FilePath
                  -> (FilePath -> Reactive ()) -- ^ Push new files / dirs
                  -> (FilePath -> Reactive ()) -- ^ Push deleted files / dirs

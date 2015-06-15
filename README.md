@@ -24,11 +24,14 @@ The generated value offers three ```Event```s:
 The function ```deltaDirWithCallbacks``` gives you an instance of the
 datatype ```CallbackWatcher``` that wraps a ```FileWatcher```.
 
-You can add callbacks to instances of that type with:
+You can add an arbitrary number callbacks to instances of that type with:
 
 * ```withChangedCallback```
 * ```withNewCallback```
 * ```withDeletedCallback```
+
+These operations give you back a ```CallbackId``` which lets you delete
+callbacks from the ```CallbackWatcher``` using ```unregisterCallback```.
 
 ## Command line interface
 

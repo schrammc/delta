@@ -10,7 +10,7 @@ main = do
   args <- getArgs
   case args of
     [path] -> do
-                watcher <- createPollWatcher 1 path >>= withCallbacks
+                watcher <- deltaDirWithCallbacks path
                 withNewCallback watcher (\x -> putStrLn $ "new:\t" ++ x)
                 withDeleteCallback watcher (\x -> putStrLn $ "del:\t" ++ x)
                 withChangedCallback watcher (\(FileInfo(x,_,_)) ->

@@ -13,12 +13,9 @@ import System.Delta.Class
 import System.Delta.Callback
 
 -- | Build a file watcher
-deltaDir :: (FileWatcher a) => FilePath -> IO a
-deltaDir path = defaultWatcher path >>= return . watcherId
+deltaDir :: FilePath -> IO PollWatcher
+deltaDir path = defaultWatcher path
 
 -- | Build a file watcher that allows to register callbacks
-deltaDirWithCallbacks :: (FileWatcher a) => FilePath -> IO (CallbackWatcher a)
+deltaDirWithCallbacks :: FilePath -> IO (CallbackWatcher PollWatcher)
 deltaDirWithCallbacks path = deltaDir path >>= withCallbacks
-
-watcherId :: (FileWatcher a) => a -> a
-watcherId a = a

@@ -25,7 +25,7 @@ data PollWatcher = PollWatcher
                      ThreadId
 
 instance FileWatcher PollWatcher where
-  defaultWatcher = createPollWatcher 15
+  defaultWatcher = createPollWatcher 3
   changedFiles (PollWatcher _ e _ _ _) = e
   newFiles     (PollWatcher _ _ e _ _) = e
   deletedFiles (PollWatcher _ _ _ e _) = e

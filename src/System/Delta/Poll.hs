@@ -1,5 +1,8 @@
-module System.Delta.Poll where
+module System.Delta.Poll ( PollWatcher
+                         , createPollWatcher
+                         )where
 
+import Control.Applicative ((<$>))
 import Control.Concurrent
 import Control.Monad (foldM)
 
@@ -28,6 +31,8 @@ instance FileWatcher PollWatcher where
   deletedFiles (PollWatcher _ _ _ e _) = e
   cleanUpAndClose (PollWatcher _ _ _ _ tId) = killThread tId
 
+-- | Watch files in this directory recursively for changes every
+-- n seconds.
 createPollWatcher :: Int      -- ^ seconds interval
                   -> FilePath -- ^ path to watch
                   -> IO PollWatcher

@@ -24,7 +24,7 @@ The generated value offers three ```Event```s:
 The function ```deltaDirWithCallbacks``` gives you an instance of the
 datatype ```CallbackWatcher``` that wraps a ```FileWatcher```.
 
-You can add an arbitrary number callbacks to instances of that type with:
+You can add an arbitrary number of callbacks to instances of that type with:
 
 * ```withChangedCallback```
 * ```withNewCallback```

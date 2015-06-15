@@ -1,5 +1,22 @@
 {-# LANGUAGE GADTs #-}
-module System.Delta.Callback where
+module System.Delta.Callback ( CallbackWatcher
+                             , CallbackId
+                               
+                             -- * Construction
+                             , withCallbacks
+                               
+                             -- * Adding callbacks
+                             , withDeleteCallback
+                             , withChangedCallback
+                             , withNewCallback
+
+                             -- * Removing callbacks
+                             , unregisterCallback
+                             , removeAllCallbacks
+
+                             -- * Closing the watcher
+                             , closeCallbackWatcher
+                             )where
 
 import FRP.Sodium
 import System.Delta.Base

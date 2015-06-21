@@ -5,6 +5,14 @@ import System.Delta.Base
 
 import Control.Monad
 
+-- | A class for watching a directory based on functional reactive programming
+-- At the core of this class are three event streams:
+--
+-- * @changedFiles@ is a stream of 'FileInfo's on changed files
+--
+-- * @newFiles@ is a stream of canonicalized 'FilePath's of newly created files
+--
+-- * @deletedFiles@ is a stream of canonicalized 'FilePath's of deleted files
 class FileWatcher a where
   -- | Each type provides a default watcher for a pass
   defaultWatcher  :: FilePath -> IO a

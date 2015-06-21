@@ -26,9 +26,11 @@ import qualified Data.Map as M
 
 import Control.Concurrent.MVar
 
+-- | Id of a callback in a 'CallbackWatcher'
 newtype CallbackId = CallbackId Integer
                    deriving (Eq, Ord)  
 
+-- | Provides a callback based interface to an FRP base 'FileWatcher'
 data CallbackWatcher w where
   CallbackWatcher :: FileWatcher w => {
     baseWatcher :: w

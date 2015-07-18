@@ -21,7 +21,7 @@ import Data.List (isPrefixOf)
 
 data PollWatcher = PollWatcher
                      [FilePath]
-                     (Event FileInfo)
+                     (Event FilePath)
                      (Event FilePath)
                      (Event FilePath)
                      [ThreadId]
@@ -107,7 +107,7 @@ diffDeletedFiles before after = M.elems $ M.difference before after
 startWatchThread :: FilePath
                  -> (FilePath -> Reactive ()) -- ^ Push new files / dirs
                  -> (FilePath -> Reactive ()) -- ^ Push deleted files / dirs
-                 -> (FileInfo -> Reactive ()) -- ^ Push changed files / dirs
+                 -> (FilePath -> Reactive ()) -- ^ Push changed files / dirs
                  -> Int -- ^ Seconds between polls
                  -> IO ThreadId
 startWatchThread path pushNew pushDeleted pushChanged secs = do
@@ -117,7 +117,7 @@ startWatchThread path pushNew pushDeleted pushChanged secs = do
     go last = do
       threadDelay $ secs * 1000 * 1000
       curr <- recursiveDescent path
-      sync $ mapM_ (pushChanged) (diffChangedFiles last curr)
+      sync $ mapM_ (pushChanged) (fileInfoPath <$> diffChangedFiles last curr)
       sync $ mapM_ (pushNew    ) (fileInfoPath <$> diffNewFiles last curr)
       sync $ mapM_ (pushDeleted) (fileInfoPath <$> diffDeletedFiles last curr)
       go curr

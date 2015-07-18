@@ -82,7 +82,7 @@ withNewCallback watcher action = do
 -- | Add a callback on a changed file
 withChangedCallback :: (FileWatcher a)
                       => CallbackWatcher a
-                        -> (FileInfo -> IO ()) -- ^ Action on changed file
+                        -> (FilePath -> IO ()) -- ^ Action on changed file
                         -> IO (CallbackId)
 withChangedCallback watcher action = do
   unregisterCallback <- callbackOnEvent (changedFiles $ baseWatcher watcher) action

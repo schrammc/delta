@@ -19,7 +19,7 @@ class FileWatcher a where
 
   -- | An event that gives some info on changed files (disjunct from
   -- deleted and new files)
-  changedFiles    :: a -> Event FileInfo
+  changedFiles    :: a -> Event FilePath
 
   -- | An event that fires for each new file
   newFiles        :: a -> Event FilePath

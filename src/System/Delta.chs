@@ -48,7 +48,7 @@ module System.Delta ( module System.Delta.Base
                     -- ** Removing callbacks
                     , unregisterCallback
                     , removeAllCallbacks
-                    , closeCallbackWatcher
+                    , closeCallbackWatcher                
                     )where
 
 import System.Delta.Base

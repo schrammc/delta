@@ -1,7 +1,6 @@
 module Main where
 
 import System.Delta
-import System.Delta.FSEvents
 import System.Environment
 
 import Control.Monad
@@ -11,8 +10,7 @@ main = do
   args <- getArgs
   case args of
     [path] -> do
-                fw <- defaultWatcher path :: IO FSEventsWatcher
-                watcher <- withCallbacks fw
+                watcher <- deltaDirWithCallbacks path
                 withNewCallback watcher (\x -> putStrLn $ "new:\t" ++ x)
                 withDeleteCallback watcher (\x -> putStrLn $ "del:\t" ++ x)
                 withChangedCallback watcher (\x ->

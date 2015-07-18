@@ -1,6 +1,5 @@
-module System.Delta.Poll ( PollWatcher
-                         , createPollWatcher
-                         )where
+module System.Delta.Poll ( createPollWatcher
+                         ) where
 
 import Control.Applicative ((<$>))
 import Control.Concurrent
@@ -19,40 +18,18 @@ import System.FilePath
 
 import Data.List (isPrefixOf)
 
-data PollWatcher = PollWatcher
-                     [FilePath]
-                     (Event FilePath)
-                     (Event FilePath)
-                     (Event FilePath)
-                     [ThreadId]
-
-instance FileWatcher PollWatcher where
-  defaultWatcher = createPollWatcher 3
-  changedFiles (PollWatcher _ e _ _ _) = e
-  newFiles     (PollWatcher _ _ e _ _) = e
-  deletedFiles (PollWatcher _ _ _ e _) = e
-  cleanUpAndClose (PollWatcher _ _ _ _ tIds) = mapM_ killThread tIds
-  mergeWatchers (PollWatcher pA cA nA dA idsA) (PollWatcher pB cB nB dB idsB) =
-    PollWatcher
-      (pA ++ pB)
-      (merge cA cB)
-      (merge nA nB)
-      (merge dA dB)
-      (idsA ++ idsB)
-    
-
 -- | Watch files in this directory recursively for changes every
 -- n seconds.
 createPollWatcher :: Int      -- ^ seconds interval
                   -> FilePath -- ^ path to watch
-                  -> IO PollWatcher
+                  -> IO FileWatcher
 createPollWatcher secs path = do
   (changedEvent, pushChanged) <- sync $ newEvent
   (deletedEvent, pushDeleted) <- sync $ newEvent
   (newFileEvent, pushNewFile) <- sync $ newEvent
   canonPath <- canonicalizePath path
   watcherId <- startWatchThread canonPath pushNewFile pushDeleted pushChanged secs
-  return $ PollWatcher [canonPath] changedEvent newFileEvent deletedEvent [watcherId]
+  return $ FileWatcher newFileEvent deletedEvent changedEvent (killThread watcherId)
 
 -- | Recursively traverse a folder, follow symbolic links but don't
 -- visit a file twice.

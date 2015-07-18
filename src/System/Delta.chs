@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes, CPP #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module : System.Delta
@@ -35,11 +35,9 @@ module System.Delta ( module System.Delta.Base
                     , deltaDirWithCallbacks
 
                     -- * FRP based interface
-                    , module System.Delta.Class
                     , FileWatcher(..)
 
                     -- * Callback based interface
-                    , module System.Delta.Callback
                     , CallbackWatcher
                     , CallbackId
                     , withCallbacks
@@ -54,14 +52,27 @@ module System.Delta ( module System.Delta.Base
                     )where
 
 import System.Delta.Base
-import System.Delta.Poll
 import System.Delta.Class
 import System.Delta.Callback
+import System.Delta.Poll
+#if defined(__APPLE__)
+import System.Delta.FSEvents
+#endif
 
--- | Build a file watcher, this method will change later
-deltaDir :: FilePath -> IO PollWatcher
-deltaDir path = defaultWatcher path
+-- | Build a file watcher, the concrete implementation is operating system
+-- dependent.
+--
+-- * The default uses polling ('createPollWatcher')
+--
+-- * The watcher for OS X uses the FS Events API 'createFSEventsWatcher'
+deltaDir :: FilePath -> IO FileWatcher
+deltaDir path = do
+#if defined(__APPLE__)
+  createFSEventsWatcher path
+#else
+  createPollWatcher 10 path
+#endif
 
 -- | Build a file watcher that allows to register callbacks
-deltaDirWithCallbacks :: FilePath -> IO (CallbackWatcher PollWatcher)
+deltaDirWithCallbacks :: FilePath -> IO CallbackWatcher
 deltaDirWithCallbacks path = deltaDir path >>= withCallbacks

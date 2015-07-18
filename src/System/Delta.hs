@@ -13,8 +13,12 @@
 -- An umberella package for the delta library. This library can be used to monitor
 -- changed / new / deleted files in a given directory (or set of directories).
 --
--- Currently this library polls the directories of interest recursively in certain
--- intervals, but I will add OS-specific functionality to monitor the filesystem.
+-- On non OS X systems this library polls the directories of interest
+-- recursively in certain intervals, but I will add OS-specific functionality to
+-- monitor the filesystem.
+--
+-- On OS X this library can use the File System Events API to detect changes
+-- without recursive directory traversal.
 --
 -- = Examples
 --

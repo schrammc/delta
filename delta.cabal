@@ -51,7 +51,7 @@ build-type:          Simple
 -- extra-source-files:  
 
 -- Constraint on the version of Cabal needed to build this package.
-cabal-version:       >= 1.18
+cabal-version:       >= 1.16
 
 flag build_fs_events
   description: Build in FSEvents support (OS X)

@@ -58,7 +58,7 @@ main = do
                                <> value 1
                              )
             <*> argument str ( metavar "FILE"
-                               <> help "The directory that is watcherd"
+                               <> help "The directory that is watched"
                              )
             <*> argument str (  metavar "CMD"
                              <> help "The command to run"

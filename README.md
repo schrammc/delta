@@ -37,6 +37,25 @@ callbacks from the ```CallbackWatcher``` using ```unregisterCallback```.
 
 ## Command line interface
 
+### delta-run
+
+This package includes a handy little executable called ```delta-run``` which
+allows you to run a command on your terminal each time a file in the directory
+you are watching changes.
+
+This is especially handy if you want to recompile some code each time it
+changes, but there are a lot of other useful applications.
+
+  Usage: delta-run [-i|--interval INTERVAL] FILE CMD
+
+  Available options:
+    -h,--help                Show this help text
+    -i,--interval INTERVAL   Run at most every n seconds
+    FILE                     The directory that is watched
+    CMD                      The command to run
+
+### delta-cli (demo only)
+
 This cabal package also ships an executable called ```delta-cli``` that currently
 watches a directory that you give as an argument
 

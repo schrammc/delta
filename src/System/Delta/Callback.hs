@@ -16,6 +16,9 @@ module System.Delta.Callback ( CallbackWatcher
 
                              -- * Closing the watcher
                              , closeCallbackWatcher
+
+                             -- * Helper functions
+                             , callbackOnEvent
                              )where
 
 import FRP.Sodium

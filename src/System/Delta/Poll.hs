@@ -33,7 +33,9 @@ createPollWatcher secs path = do
 
 -- | Recursively traverse a folder, follow symbolic links but don't
 -- visit a file twice.
-recursiveDescent path = recursiveDescent' M.empty path
+recursiveDescent path =
+  M.filterWithKey (\_ -> not . fileInfoIsDir) <$> -- files only
+    recursiveDescent' M.empty path
 
 -- | Recursively traverse a folder, follows symbolic links,
 -- doesn't loop however.
@@ -95,6 +97,6 @@ startWatchThread path pushNew pushDeleted pushChanged secs = do
       threadDelay $ secs * 1000 * 1000
       curr <- recursiveDescent path
       sync $ mapM_ (pushChanged) (fileInfoPath <$> diffChangedFiles last curr)
-      sync $ mapM_ (pushNew    ) (fileInfoPath <$> diffNewFiles last curr)
+      sync $ mapM_ (pushNew    ) (fileInfoPath <$> diffNewFiles last curr    )
       sync $ mapM_ (pushDeleted) (fileInfoPath <$> diffDeletedFiles last curr)
       go curr

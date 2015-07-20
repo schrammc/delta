@@ -74,7 +74,7 @@ deltaDir path = do
 #if defined(__APPLE__)
   createFSEventsWatcher path
 #else
-  createPollWatcher 10 path
+  createPollWatcher 5 path
 #endif
 
 -- | Build a file watcher that allows to register callbacks

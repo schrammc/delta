@@ -46,13 +46,13 @@ you are watching changes.
 This is especially handy if you want to recompile some code each time it
 changes, but there are a lot of other useful applications.
 
-  Usage: delta-run [-i|--interval INTERVAL] FILE CMD
+    Usage: delta-run [-i|--interval INTERVAL] FILE CMD
 
-  Available options:
-    -h,--help                Show this help text
-    -i,--interval INTERVAL   Run at most every n seconds
-    FILE                     The directory that is watched
-    CMD                      The command to run
+    Available options:
+      -h,--help                Show this help text
+      -i,--interval INTERVAL   Run at most every n seconds
+      FILE                     The directory that is watched
+      CMD                      The command to run
 
 ### delta-cli (demo only)
 

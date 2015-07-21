@@ -20,8 +20,10 @@ description:         Delta is a library for detecting file changes in any given
                      directory. The package is written using the sodium FRP library
                      but it also provides a callback based API.
 
-                     The project also contains an executable, delta-cli which
-                     runs on the command line and prints detected changes to stdout.
+                     The project also contains an executable, delta-run, which
+                     allows you to run arbitrary shell commands when a file in a
+                     directory (recursively) changes.
+
 
 -- URL for the project homepage or repository.
 homepage:            https://github.com/kryoxide/delta

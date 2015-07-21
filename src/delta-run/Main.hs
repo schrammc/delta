@@ -16,6 +16,8 @@ import System.Directory
 import System.IO
 import System.Process
 
+import Debug.Trace
+
 data Input = Input { inputSeconds :: Int
                    , inputDir     :: FilePath
                    , inputCommand :: String
@@ -41,12 +43,15 @@ main = do
 
               ticker <- periodical (1000 * (inputSeconds input)) ()
 
-              runE <- sync $
-                       mkRunEvent mergedEvent (tickerEvent ticker) (runCmd input)
+              runE <- sync $ mkRunEvent
+                               mergedEvent
+                               (tickerEvent ticker)
+                               (runCmd input)
+                               
+              _ <- sync $  listen runE (id)
 
-              sync $ listen runE (\_ -> runCmd input)
-                                            
-              threadDelay $ 15 * 1000 * 1000
+              -- Sleep till interrupted (or exception)
+              forever $ threadDelay $ 50000000
           )
   where
     opts  = info (helper <*> optsP) (fullDesc)
@@ -79,14 +84,14 @@ mkRunEvent :: Event FilePath  -- ^ Changed / Deleted / New file event
            -> Reactive (Event (IO ()))
 mkRunEvent change ticker run = do
   rec
-    enabled <- hold True $ (const False <$> fire) `merge` (const True <$> ticker)
-    fireDue <- hold False $ (const True <$> change) `merge` (const False <$> fire)
+    enabled <- hold True $ (const False <$> fire  ) `merge` (const True <$> ticker)
+    fireDue <- hold False $ (const True <$> change) `merge` (const False <$> fire )
     let firable = (&&) <$> enabled <*> fireDue
 
     -- Only when we have become firable after not being firable
-    fire <- filterE (id) <$> (collectE (\c -> \p -> ((c /= p) && c,c))
-                              True
-                              (updates firable)
+    fire <- filterE (id) <$> ( collectE (\c -> \p ->  ((c /= p) && c,c))
+                               True
+                               (updates firable)
                              )
 
   return (const run <$> fire)

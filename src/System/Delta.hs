@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, CPP #-}
+{-# LANGUAGE CPP #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module : System.Delta
@@ -59,7 +59,7 @@ import System.Delta.Base
 import System.Delta.Class
 import System.Delta.Callback
 import System.Delta.Poll
-#if defined(__APPLE__)
+#ifdef darwin_HOST_OS
 import System.Delta.FSEvents
 #endif
 
@@ -71,8 +71,10 @@ import System.Delta.FSEvents
 -- * The watcher for OS X uses the FS Events API 'createFSEventsWatcher'
 deltaDir :: FilePath -> IO FileWatcher
 deltaDir path = do
-#if defined(__APPLE__)
+#ifdef darwin_HOST_OS
   createFSEventsWatcher path
+-- ifdef linux_HOST_OS
+-- ifdef mingw32_HOST_OS
 #else
   createPollWatcher 5 path
 #endif

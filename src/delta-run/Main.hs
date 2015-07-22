@@ -16,9 +16,8 @@ import System.Directory
 import System.IO
 import System.Process
 
-import Debug.Trace
-
 data Input = Input { inputSeconds :: Int
+                   , inputVerbose :: Bool
                    , inputDir     :: FilePath
                    , inputCommand :: String
                    }
@@ -33,10 +32,15 @@ main = do
            exitFailure
        )
 
-  bracket (deltaDir $ inputDir input)
-          cleanUpAndClose -- Will run after Ctrl-C
+  bracket (do
+              when (inputVerbose input) $ putStrLn "Started watching."
+              deltaDir $ inputDir input
+          )
           (\watcher -> do
-
+            when (inputVerbose input) $ putStrLn "Closing watcher."
+            cleanUpAndClose watcher -- Will run after Ctrl-C
+          )
+          (\watcher -> do
               let mergedEvent = (newFiles     watcher) `merge`
                                 (deletedFiles watcher) `merge`
                                 (changedFiles watcher)
@@ -62,6 +66,10 @@ main = do
                                <> help "Run at most every n seconds"
                                <> value 1
                              )
+            <*> flag False True (long "verbose"
+                                 <> short 'v'
+                                 <> help "Print extra output"
+                                 )
             <*> argument str ( metavar "FILE"
                                <> help "The directory that is watched"
                              )
@@ -69,12 +77,14 @@ main = do
                              <> help "The command to run"
                              )
     runCmd input = do
+      when (inputVerbose input) $ putStrLn "Starting process."
       (_,_,_,procHandle) <-
         createProcess $ (shell $ inputCommand input){ std_in  = Inherit
                                                     , std_out = Inherit
                                                     , std_err = Inherit
                                                     }
       waitForProcess procHandle
+      when (inputVerbose input) $ putStrLn "Process done"
       return ()
               
             

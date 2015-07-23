@@ -5,6 +5,7 @@ import Control.Concurrent
 import Control.Exception
 import Control.Monad
 
+import qualified FRP.Sodium (value)
 import FRP.Sodium hiding (value)
 import FRP.Sodium.IO
 import Options.Applicative
@@ -47,12 +48,10 @@ main = do
 
               ticker <- periodical (1000 * (inputSeconds input)) ()
 
-              runE <- sync $ mkRunEvent
+              sync $ mkRunEvent
                                mergedEvent
                                (tickerEvent ticker)
                                (runCmd input)
-                               
-              _ <- sync $  listen runE (id)
 
               -- Sleep till interrupted (or exception)
               forever $ threadDelay $ 50000000
@@ -64,7 +63,7 @@ main = do
                                <> short 'i'
                                <> metavar "INTERVAL"
                                <> help "Run at most every n seconds"
-                               <> value 1
+                               <> value 3
                              )
             <*> flag False True (long "verbose"
                                  <> short 'v'
@@ -91,18 +90,12 @@ main = do
 mkRunEvent :: Event FilePath  -- ^ Changed / Deleted / New file event
            -> Event ()        -- ^ The periodical event
            -> IO ()           -- ^ Execute the input command
-           -> Reactive (Event (IO ()))
-mkRunEvent change ticker run = do
-  rec
-    enabled <- hold True $ (const False <$> fire  ) `merge` (const True <$> ticker)
-    fireDue <- hold False $ (const True <$> change) `merge` (const False <$> fire )
-    let firable = (&&) <$> enabled <*> fireDue
+           -> Reactive ()
+mkRunEvent change ticker run = mdo
+  enabled <- hold True  $ (const False <$> fire) `merge` (const True <$> ticker)
 
-    -- Only when we have become firable after not being firable
-    fire <- filterE (id) <$> ( collectE (\c -> \p ->  ((c /= p) && c,c))
-                               True
-                               (updates firable)
-                             )
+  let fire = gate change enabled
 
-  return (const run <$> fire)
-  
+  listen fire (const run)
+
+  return ()

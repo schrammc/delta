@@ -1,5 +1,5 @@
 {-# LANGUAGE RecursiveDo #-}
-module Main where
+module Main (main) where
 
 import Control.Concurrent
 import Control.Exception
@@ -24,15 +24,20 @@ data Input = Input { inputSeconds :: Int
                    }
                    deriving Show
 main = do
+
+  -- Parse command line options
   input <- execParser opts
   inputDirExists <- doesDirectoryExist $ inputDir input
 
+  -- Check for existence of input dir
   when (not inputDirExists)
        (do
            hPutStrLn stderr $ inputDir input  ++ " doesn't exist"
            exitFailure
        )
 
+  -- Create a directory watcher, start running it and sleep until we get an
+  -- exception or an interrupt. In both cases we close the watcher and exit.
   bracket (do
               when (inputVerbose input) $ putStrLn "Started watching."
               deltaDir $ inputDir input
@@ -42,16 +47,20 @@ main = do
             cleanUpAndClose watcher -- Will run after Ctrl-C
           )
           (\watcher -> do
+              -- We execute the command on all possible incoming events
               let mergedEvent = (newFiles     watcher) `merge`
                                 (deletedFiles watcher) `merge`
                                 (changedFiles watcher)
 
-              ticker <- periodical (1000 * (inputSeconds input)) ()
+              -- Start a process
+              ticker <- if inputSeconds input > 0
+                        then Just <$> periodical (1000 * (inputSeconds input)) ()
+                        else return Nothing
 
-              sync $ mkRunEvent
-                               mergedEvent
-                               (tickerEvent ticker)
-                               (runCmd input)
+              sync $ mkRunEvent (inputVerbose input)
+                                mergedEvent
+                                ticker
+                                (runCmd input)
 
               -- Sleep till interrupted (or exception)
               forever $ threadDelay $ 50000000
@@ -85,17 +94,27 @@ main = do
       waitForProcess procHandle
       when (inputVerbose input) $ putStrLn "Process done"
       return ()
-              
-            
-mkRunEvent :: Event FilePath  -- ^ Changed / Deleted / New file event
-           -> Event ()        -- ^ The periodical event
-           -> IO ()           -- ^ Execute the input command
+      
+-- | Create an action that will run the given IO action when changes occur. The
+-- given action will not be run twice inbetween two firings of the ticker event.
+mkRunEvent :: Bool              -- ^ Verbose output
+           -> Event FilePath    -- ^ Changed / Deleted / New file event
+           -> Maybe (Ticker ()) -- ^ The periodical event
+           -> IO ()             -- ^ Execute the input command
            -> Reactive ()
-mkRunEvent change ticker run = mdo
-  enabled <- hold True  $ (const False <$> fire) `merge` (const True <$> ticker)
+mkRunEvent verbose change tickerMaybe run =
+  case tickerMaybe of
+   Just ticker -> mdo
+     let tickerE = tickerEvent ticker
+     enabled <- hold True  $ (const False <$> fire) `merge` (const True <$> tickerE)
 
-  let fire = gate change enabled
+     let fire = gate change enabled
 
-  listen fire (const run)
+     listen fire runAction
 
-  return ()
+     return ()
+   Nothing -> listen change runAction >> return ()
+  where
+    runAction path = do
+      when verbose $ putStrLn ("Running command after change in file " ++ path)
+      run

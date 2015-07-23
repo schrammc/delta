@@ -10,7 +10,7 @@ name:                delta
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.2.1.1
+version:             0.2.1.2
 
 -- A short (one-line) description of the package.
 synopsis:            A library for detecting file changes
@@ -19,10 +19,36 @@ synopsis:            A library for detecting file changes
 description:         Delta is a library for detecting file changes in any given
                      directory. The package is written using the sodium FRP library
                      but it also provides a callback based API.
-
+                     .
+                     File changes on OS X are based on the @FSEvents@ API that is also
+                     used by TimeMachine. On other operating systems the library
+                     currently uses recursive descents in directories. I will include
+                     @inotify@ for Linux. If someone would like to have a non-polling
+                     based API for windows or BSD, I would really like it if anyone
+                     would contribute.
+                     .
                      The project also contains an executable, delta-run, which
                      allows you to run arbitrary shell commands when a file in a
-                     directory (recursively) changes.
+                     directory (recursively) changes. 
+                     .
+                     @
+                     $> delta-run --help
+                     Usage: delta-run [-i|--interval INTERVAL] [-v|--verbose] FILE CMD
+
+                     Available options:
+			    -h,--help                Show this help text
+			    -i,--interval INTERVAL   Run at most every n seconds
+			    -v,--verbose             Print extra output
+			    FILE                     The directory that is watched
+                            CMD                      The command to run
+
+                     @
+                     .
+                     For example you could use @delta-run@ to rebuild your project
+                     everytime the source changes like this:
+                     @
+                     delta-run ./src "cabal build"
+                     @
 
 
 -- URL for the project homepage or repository.

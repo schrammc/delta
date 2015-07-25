@@ -46,8 +46,9 @@ description:         Delta is a library for detecting file changes in any given
                      .
                      For example you could use @delta-run@ to rebuild your project
                      everytime the source changes like this:
+                     .
                      @
-                     delta-run ./src "cabal build"
+                     delta-run ./src \"cabal build\"
                      @
 
 
@@ -70,7 +71,7 @@ maintainer:          christof.schramm@campus.lmu.de
 -- A copyright notice.
 -- copyright:           
 
-category:            Data
+category:            System
 
 build-type:          Simple
 
@@ -80,6 +81,8 @@ build-type:          Simple
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >= 1.16
+
+extra-source-files:  README.md
 
 flag build_fs_events
   description: Build in FSEvents support (OS X)
